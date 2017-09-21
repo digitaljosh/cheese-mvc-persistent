@@ -17,11 +17,11 @@
     </tr>
 
     <tr th:each="menu : ${menus}">
-        <td th:text="${menu.name}"></td>
-
+        <td><a th:href="'/menu/view/' + ${menu.id}" th:text="${menu.name}"></a></td>
     </tr>
 
 </table>
+
 
 <a href="menu/add">Add Menu</a>
 

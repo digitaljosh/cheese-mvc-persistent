@@ -44,8 +44,8 @@ public class MenuController {
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public String processAddMenu(Model model, @ModelAttribute @Valid Menu menu,
-                             Errors erros) {
-        if (erros.hasErrors()) {
+                             Errors errors) {
+        if (errors.hasErrors()) {
             model.addAttribute("title", "Add Menu");
             return "menu/add";
         }
@@ -55,24 +55,22 @@ public class MenuController {
     }
 
     @RequestMapping(value = "view/{menuId}", method = RequestMethod.GET)
-    public String viewMenu(Model model, @PathVariable int menuId, @ModelAttribute Menu menu) {
+    public String viewMenu(Model model, @PathVariable int menuId) {
 
         Menu thisMenu = menuDao.findOne(menuId);
-
-
-        model.addAttribute("menu", thisMenu);
         model.addAttribute("title", thisMenu.getName());
+        model.addAttribute("cheeses", thisMenu.getCheeses());
+        model.addAttribute("menuId", thisMenu.getId());
 
         return "menu/view";
     }
 
     @RequestMapping(value = "add-item/{menuId}", method = RequestMethod.GET)
-    public String displayAddMenuItem(Model model, @PathVariable int menuId,
-                          @ModelAttribute Menu menu) {
+    public String displayAddMenuItem(Model model, @PathVariable int menuId) {
 
         Menu thisMenu = menuDao.findOne(menuId);
 
-        AddMenuForm form = new AddMenuForm(menu, cheeseDao.findAll());
+        AddMenuForm form = new AddMenuForm(thisMenu, cheeseDao.findAll());
 
         model.addAttribute("form", form);
         model.addAttribute("title", "Add item to menu: " + thisMenu.getName());
@@ -91,11 +89,10 @@ public class MenuController {
 
         Cheese theCheese = cheeseDao.findOne(form.getCheeseId());
         Menu theMenu = menuDao.findOne(form.getMenuId());
-
+        theMenu.addItem(theCheese);
         menuDao.save(theMenu);
-        cheeseDao.save(theCheese);
 
-        return "redirect:";
+        return "redirect:/menu/view/" + theMenu.getId();
 
 
     }
